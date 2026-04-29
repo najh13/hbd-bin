@@ -19,7 +19,7 @@
             color: white;
         }
 
-        /* Background Gunung */
+        /* Latar Belakang Gunung dari File Upload */
         #bg-container {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -35,9 +35,10 @@
             background-size: auto 100%;
             image-rendering: pixelated;
         }
-        #layer-back { background-image: url('https://raw.githubusercontent.com/itinerantgames/pixel-parallax/master/mountain_back.png'); z-index: 2; height: 40vh; opacity: 0.3; animation: moveBg 100s linear infinite; }
-        #layer-mid { background-image: url('https://raw.githubusercontent.com/itinerantgames/pixel-parallax/master/mountain_mid.png'); z-index: 3; height: 30vh; opacity: 0.5; animation: moveBg 60s linear infinite; }
-        #layer-front { background-image: url('https://raw.githubusercontent.com/itinerantgames/pixel-parallax/master/mountain_front.png'); z-index: 4; height: 20vh; animation: moveBg 30s linear infinite; }
+        /* Memanggil file yang kamu upload di GitHub */
+        #layer-back { background-image: url('mountain_back.png'); z-index: 2; height: 45vh; opacity: 0.4; animation: moveBg 100s linear infinite; }
+        #layer-mid { background-image: url('mountain_mid.png'); z-index: 3; height: 35vh; opacity: 0.6; animation: moveBg 60s linear infinite; }
+        #layer-front { background-image: url('mountain_front.png'); z-index: 4; height: 25vh; animation: moveBg 30s linear infinite; }
 
         @keyframes moveBg { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
@@ -59,39 +60,32 @@
             box-shadow: 4px 4px 0px #000;
         }
 
-        /* UI Kue */
-        #ui-layer {
-            position: absolute;
-            bottom: 15%;
-            z-index: 20;
-            width: 100%;
-            text-align: center;
-            display: none;
-        }
-        .cake-container { font-size: 3rem; margin-bottom: 20px; position: relative; cursor: pointer; display: inline-block; }
-        .flame { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); animation: flicker 0.1s infinite alternate; }
-        @keyframes flicker { from { opacity: 0.8; transform: translateX(-50%) scale(1); } to { opacity: 1; transform: translateX(-50%) scale(1.3); } }
-
-        /* Frame Foto */
+        /* Frame Foto Bidin */
         #photo-container {
             position: absolute;
-            width: 70%;
-            max-width: 300px;
+            width: 75%;
+            max-width: 320px;
             display: none;
             z-index: 25;
-            border: 8px solid white;
-            box-shadow: 0 0 20px rgba(255,255,255,0.5);
-            background: #fff;
+            padding: 10px;
+            background: white;
+            border-bottom: 30px solid white; /* Efek Polaroid */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             transform: rotate(-3deg);
-            animation: appear 1s ease-out;
+            animation: polaroidAppear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        #photo-container img { width: 100%; height: auto; display: block; }
-        @keyframes appear { from { transform: scale(0) rotate(10deg); opacity: 0; } to { transform: scale(1) rotate(-3deg); opacity: 1; } }
+        #photo-container img { width: 100%; height: auto; display: block; border: 1px solid #ddd; }
+        @keyframes polaroidAppear { from { transform: scale(0) rotate(15deg); opacity: 0; } to { transform: scale(1) rotate(-3deg); opacity: 1; } }
+
+        #ui-layer { position: absolute; bottom: 15%; z-index: 20; width: 100%; text-align: center; display: none; }
+        .cake-container { font-size: 3rem; cursor: pointer; display: inline-block; position: relative; }
+        .flame { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); animation: flicker 0.1s infinite alternate; }
+        @keyframes flicker { from { opacity: 0.8; transform: translateX(-50%) scale(1); } to { opacity: 1; transform: translateX(-50%) scale(1.2); } }
 
         .hbd-text {
             display: none;
             position: absolute;
-            top: 10%;
+            top: 8%;
             z-index: 26;
             color: #f1c40f;
             text-align: center;
@@ -113,13 +107,13 @@
     <canvas id="pixel-canvas"></canvas>
 
     <div id="overlay">
-        <h1>29 APRIL 2026...<br>MISI PENCARIAN BIDIN</h1>
-        <button onclick="initSequence()">SAYA BIDIN</button>
+        <h1>MISI SELESAI...<br>BIDIN DITEMUKAN?</h1>
+        <button onclick="initSequence()">KONFIRMASI</button>
     </div>
 
-    <!-- Ganti dengan foto Bidin -->
+    <!-- Pastikan nama file di src ini sama dengan yang kamu upload ke GitHub -->
     <div id="photo-container">
-        <img src="foto_bidin.jpeg" alt="HBD Bidin!">
+        <img src="foto_bidin.jpg" alt="Bidin">
     </div>
     
     <div class="hbd-text" id="hbd-text">HAPPY BIRTHDAY<br>BIDIN! 🎆</div>
@@ -127,11 +121,13 @@
     <div id="ui-layer">
         <div class="cake-container" onclick="blowCandle()">
             <span class="flame" id="lilin">🔥</span>
-            🎂<br><span style="font-size: 0.8rem; text-shadow: 2px 2px #000;">BDN</span>
+            🎂
         </div>
+        <p style="font-size: 0.5rem; margin-top: 10px; color: #f1c40f;">TIUP LILINNYA!</p>
     </div>
 
     <script>
+        // Logika kembang api dan partikel tetap sama
         const mainCanvas = document.getElementById('pixel-canvas');
         const mCtx = mainCanvas.getContext('2d');
         const fwCanvas = document.getElementById('fireworks-canvas');
@@ -196,14 +192,12 @@
             }
             update() {
                 if (!this.exploded) {
-                    this.x += this.vx;
-                    this.y += this.vy;
+                    this.x += this.vx; this.y += this.vy;
                     if (this.vy >= -1) this.explode();
                     this.vy += 0.15;
                 } else {
                     this.sparks.forEach((s, i) => {
-                        s.x += s.vx; s.y += s.vy;
-                        s.vy += 0.1; s.alpha -= 0.01;
+                        s.x += s.vx; s.y += s.vy; s.vy += 0.1; s.alpha -= 0.01;
                         if (s.alpha <= 0) this.sparks.splice(i, 1);
                     });
                 }
@@ -213,12 +207,7 @@
                 for (let i = 0; i < 50; i++) {
                     const angle = Math.random() * Math.PI * 2;
                     const speed = Math.random() * 5 + 2;
-                    this.sparks.push({
-                        x: this.x, y: this.y,
-                        vx: Math.cos(angle) * speed,
-                        vy: Math.sin(angle) * speed,
-                        alpha: 1
-                    });
+                    this.sparks.push({ x: this.x, y: this.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, alpha: 1 });
                 }
             }
             draw() {
@@ -277,21 +266,18 @@
                 document.getElementById('ui-layer').style.display = 'none';
                 document.getElementById('photo-container').style.display = 'block';
                 document.getElementById('hbd-text').style.display = 'block';
-                // Mulai kembang api
-                setInterval(() => { if(fireworks.length < 10) fireworks.push(new Firework()); }, 500);
+                setInterval(() => { if(fireworks.length < 8) fireworks.push(new Firework()); }, 400);
             }, 1000);
         }
 
         function animate() {
             mCtx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
             fCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
-            
             particles.forEach(p => { p.update(); p.draw(); });
             fireworks.forEach((fw, i) => {
                 fw.update(); fw.draw();
                 if (fw.exploded && fw.sparks.length === 0) fireworks.splice(i, 1);
             });
-            
             requestAnimationFrame(animate);
         }
     </script>
