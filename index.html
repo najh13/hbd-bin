@@ -19,7 +19,7 @@
             color: white;
         }
 
-        /* Latar Belakang Gunung dari File Upload */
+        /* Background Gunung */
         #bg-container {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -35,7 +35,6 @@
             background-size: auto 100%;
             image-rendering: pixelated;
         }
-        /* Memanggil file yang kamu upload di GitHub */
         #layer-back { background-image: url('mountain_back.png'); z-index: 2; height: 45vh; opacity: 0.4; animation: moveBg 100s linear infinite; }
         #layer-mid { background-image: url('mountain_mid.png'); z-index: 3; height: 35vh; opacity: 0.6; animation: moveBg 60s linear infinite; }
         #layer-front { background-image: url('mountain_front.png'); z-index: 4; height: 25vh; animation: moveBg 30s linear infinite; }
@@ -46,7 +45,7 @@
         #pixel-canvas { z-index: 10; pointer-events: auto; }
         #fireworks-canvas { z-index: 5; pointer-events: none; }
 
-        /* Overlay Awal */
+        /* Step 1: Overlay Awal */
         #overlay { z-index: 30; text-align: center; padding: 20px; }
         h1 { font-size: 0.7rem; margin-bottom: 30px; line-height: 1.8; text-shadow: 3px 3px #000; }
         button {
@@ -60,38 +59,42 @@
             box-shadow: 4px 4px 0px #000;
         }
 
-        /* Frame Foto Bidin */
+        /* Step 3: Frame Foto Bidin (Polaroid Style) */
         #photo-container {
             position: absolute;
             width: 75%;
             max-width: 320px;
             display: none;
             z-index: 25;
-            padding: 10px;
+            padding: 15px 15px 40px 15px; /* Space bawah lebih lebar buat efek Polaroid */
             background: white;
-            border-bottom: 30px solid white; /* Efek Polaroid */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             transform: rotate(-3deg);
             animation: polaroidAppear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        #photo-container img { width: 100%; height: auto; display: block; border: 1px solid #ddd; }
-        @keyframes polaroidAppear { from { transform: scale(0) rotate(15deg); opacity: 0; } to { transform: scale(1) rotate(-3deg); opacity: 1; } }
+        #photo-container img { width: 100%; height: auto; display: block; border: 1px solid #eee; }
+        
+        @keyframes polaroidAppear { 
+            from { transform: scale(0) rotate(15deg) translateY(100px); opacity: 0; } 
+            to { transform: scale(1) rotate(-3deg) translateY(0); opacity: 1; } 
+        }
 
+        /* Step 2: UI Kue */
         #ui-layer { position: absolute; bottom: 15%; z-index: 20; width: 100%; text-align: center; display: none; }
-        .cake-container { font-size: 3rem; cursor: pointer; display: inline-block; position: relative; }
-        .flame { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); animation: flicker 0.1s infinite alternate; }
+        .cake-container { font-size: 4rem; cursor: pointer; display: inline-block; position: relative; filter: drop-shadow(0 0 10px rgba(255,165,0,0.5)); }
+        .flame { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); animation: flicker 0.1s infinite alternate; }
         @keyframes flicker { from { opacity: 0.8; transform: translateX(-50%) scale(1); } to { opacity: 1; transform: translateX(-50%) scale(1.2); } }
 
         .hbd-text {
             display: none;
             position: absolute;
-            top: 8%;
+            top: 10%;
             z-index: 26;
             color: #f1c40f;
             text-align: center;
             width: 100%;
-            font-size: 0.9rem;
-            text-shadow: 2px 2px #000;
+            font-size: 1rem;
+            text-shadow: 3px 3px #000;
         }
     </style>
 </head>
@@ -107,27 +110,26 @@
     <canvas id="pixel-canvas"></canvas>
 
     <div id="overlay">
-        <h1>MISI SELESAI...<br>BIDIN DITEMUKAN?</h1>
-        <button onclick="initSequence()">KONFIRMASI</button>
+        <h1>MISI PENCARIAN DIMULAI...<br>APAKAH INI BIDIN?</h1>
+        <button onclick="initSequence()">IYA, SAYA BIDIN</button>
     </div>
 
-    <!-- Pastikan nama file di src ini sama dengan yang kamu upload ke GitHub -->
+    <!-- PENTING: src disesuaikan dengan file kamu (foto_bidin.jpeg) -->
     <div id="photo-container">
         <img src="foto_bidin.jpeg" alt="Bidin">
     </div>
     
-    <div class="hbd-text" id="hbd-text">HAPPY BIRTHDAY<br>BIDIN! </div>
+    <div class="hbd-text" id="hbd-text">HAPPY BIRTHDAY<br>BIDIN! 🎆</div>
 
     <div id="ui-layer">
         <div class="cake-container" onclick="blowCandle()">
             <span class="flame" id="lilin">🔥</span>
             🎂
         </div>
-        <p style="font-size: 0.5rem; margin-top: 10px; color: #f1c40f;">KLIK KUE UNTUK TIUP LILIN</p>
+        <p style="font-size: 0.5rem; margin-top: 15px; color: #f1c40f; text-shadow: 1px 1px #000;">TIUP LILINNYA, DIN!</p>
     </div>
 
     <script>
-        // Logika kembang api dan partikel tetap sama
         const mainCanvas = document.getElementById('pixel-canvas');
         const mCtx = mainCanvas.getContext('2d');
         const fwCanvas = document.getElementById('fireworks-canvas');
@@ -204,9 +206,9 @@
             }
             explode() {
                 this.exploded = true;
-                for (let i = 0; i < 50; i++) {
+                for (let i = 0; i < 60; i++) {
                     const angle = Math.random() * Math.PI * 2;
-                    const speed = Math.random() * 5 + 2;
+                    const speed = Math.random() * 6 + 2;
                     this.sparks.push({ x: this.x, y: this.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, alpha: 1 });
                 }
             }
@@ -259,14 +261,14 @@
             if(isBlown) return;
             isBlown = true;
             document.getElementById('lilin').style.display = 'none';
-            particles.forEach(p => { p.vx = (Math.random() - 0.5) * 45; p.vy = (Math.random() - 0.8) * 45; });
+            particles.forEach(p => { p.vx = (Math.random() - 0.5) * 50; p.vy = (Math.random() - 0.8) * 50; });
 
             setTimeout(() => {
                 particles = [];
                 document.getElementById('ui-layer').style.display = 'none';
                 document.getElementById('photo-container').style.display = 'block';
                 document.getElementById('hbd-text').style.display = 'block';
-                setInterval(() => { if(fireworks.length < 8) fireworks.push(new Firework()); }, 400);
+                setInterval(() => { if(fireworks.length < 10) fireworks.push(new Firework()); }, 400);
             }, 1000);
         }
 
